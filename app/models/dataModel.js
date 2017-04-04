@@ -12,15 +12,12 @@ var request = require('request');
 
 var dataSchema = new mongoose.Schema({
     companyName: String,
-
-    globUrl: String,
-    data: String,
-    hashSum :String,
     
     urls:[{
         url:String,
         data: String,
-        hashCode: String
+        hashCode: String,
+        update: Number //при инициализации 0 !!!!
     }]
 });
 
@@ -45,6 +42,7 @@ exports.monitoring = function(){
                         else{
                             //здесь проверка по ключевым словам
                             ahtyng(company.companyName, data.url, '')
+                            data.updated++;
                             /*if (false){
                                 ahtyng(company.companyName, data.url, key)
                             }
@@ -82,6 +80,10 @@ function downloadPage(url) {
                 if (!error && response.statusCode === 200) {
                     let data;
                     try{
+                        console.log(url.indexOf('e-disclosure.ru'))
+                        //if (url.indexOf('e-disclosure.ru') >= 0){
+                        //  console.log(body);
+                        //}
                         data = body
                             .replace(/<\/?[^>]+>/g,'')
                             .replace(/ /g, '')
