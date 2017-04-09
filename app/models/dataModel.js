@@ -8,6 +8,9 @@ var server 	= require('emailjs/email').server.connect({
 });
 var mongoose = require('mongoose');
 var request = require('request');
+let cheerio = require('cheerio');
+var needle = require('needle');
+var iconv  = require('iconv-lite');
 
 
 var dataSchema = new mongoose.Schema({
@@ -34,25 +37,40 @@ exports.monitoring = function(){
     dataModel.find().then(function(result){
         result.map(company => {
             company.urls.map(data =>{
-                downloadPage(data.url).then(function(result, err){
+                downloadPage(data.url).then(function(new_result, err){
                     if (data.hashCode != undefined && data.hashCode != ''){
-                        if (data.hashCode == result.hashCode()){
-                            console.log(company.companyName + ' обновлений нет');
+                        if (data.hashCode == new_result.hashCode()){
+                            console.log(company.companyName + ', '+ data.url+' обновлений нет');
                         }
                         else{
                             //здесь проверка по ключевым словам
-                            ahtyng(company.companyName, data.url, '')
-                            data.updated++;
-                            /*if (false){
-                                ahtyng(company.companyName, data.url, key)
-                            }
-                            else{
-                                console.log(comany.companyName + ' обновлений нет');
-                            }*/
+                            let keys = getConfig().keyWords;
+                            for (let i=0; i<keys.length; i++) {
+                                let last_count = 0;
+                                let new_count = 0;
+                                while (true) {
+                                    let foundPos = data.data.indexOf(keys[i], last_count);
+                                    if (foundPos == -1) 
+                                        break;
+                                    last_count = foundPos + 1;
+                                }
+                                while (true) {
+                                    let foundPos = new_result.indexOf(keys[i], new_count);
+                                    if (foundPos == -1) 
+                                        break;
+                                    new_count = foundPos + 1;
+                                }
+                                //если число ключевых слов изменилось, то оповещаем об этом
+                                if(last_count > new_count){
+                                    ahtyng(company.companyName, data.url, key)
+                                    data.updated++;
+                                    break;
+                                } 
+                            }  
                         }
                     }
-                    data.hashCode = result.hashCode();
-                    data.data = result;
+                    data.hashCode = new_result.hashCode();
+                    data.data = new_result;
                     company.save();
                 })
             })
@@ -61,12 +79,11 @@ exports.monitoring = function(){
 }
 
 function ahtyng(name, url, key){
-    console.log(name+' обновление с ключевым словом '+key);
     server.send({
         text: name+' обновление с ключевым словом '+key+', url: '+url, 
         from: 'Рейтинг <reestr@da-strateg.ru>',
         to: getConfig().email,
-        subject: 'Обновление'
+        subject: name+'Обновление'
     }, function(err, message) { console.log(err || message); });
 }
 
@@ -74,16 +91,14 @@ function downloadPage(url) {
     return new Promise((resolve, reject) => {
         request({
             url: url,
-            json: true
             }, function (error, response, body) {
-                console.log(url)
                 if (!error && response.statusCode === 200) {
                     let data;
                     try{
-                        console.log(url.indexOf('e-disclosure.ru'))
-                        //if (url.indexOf('e-disclosure.ru') >= 0){
-                        //  console.log(body);
-                        //}
+                        if (url.indexOf('e-disclosure.ru') >= 0){
+                            let $ = cheerio.load(body);
+                            body = $('#content2').html();
+                        }
                         data = body
                             .replace(/<\/?[^>]+>/g,'')
                             .replace(/ /g, '')
@@ -95,7 +110,7 @@ function downloadPage(url) {
                     }
                 }
             }
-        ); 
+        );
     });
 }
 
