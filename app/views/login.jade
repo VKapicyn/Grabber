@@ -1,0 +1,34 @@
+html
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+
+    // Styles
+    link(rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css")
+    link(rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css")
+    link(href='/css/styles.css' rel="stylesheet" type="text/css")
+
+    //JS
+    script(src='/js/jquery-3.1.1.min.js')
+    script(src="//netdna.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js")
+    script(src='/js/dateFormat.js')
+    title Главная
+body
+    .container
+        .row
+            .col-md-4
+            .col-md-4
+                br
+                br
+                .search-block    
+                    center      
+                        h3 Авторизуйтесь
+                    form(method='post', action='/user/login')
+                        center
+                            input(type='text', name='username', placeholder='Логин')
+                            br
+                            input(type='password', name='password', placeholder='Пароль')
+                            br
+                            br
+                            input(type='submit' class="btn btn-success btn-mine")
+                    br

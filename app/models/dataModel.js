@@ -15,12 +15,11 @@ var iconv  = require('iconv-lite');
 
 var dataSchema = new mongoose.Schema({
     companyName: String,
-    
+    update: Number, //при инициализации 0
     urls:[{
         url:String,
         data: String,
-        hashCode: String,
-        update: Number //при инициализации 0 !!!!
+        hashCode: String  
     }]
 });
 
@@ -39,6 +38,7 @@ exports.monitoring = function(){
             company.urls.map(data =>{
                 downloadPage(data.url).then(function(new_result, err){
                     if (data.hashCode != undefined && data.hashCode != ''){
+
                         if (data.hashCode == new_result.hashCode()){
                             console.log(company.companyName + ', '+ data.url+' обновлений нет');
                         }
@@ -48,22 +48,29 @@ exports.monitoring = function(){
                             for (let i=0; i<keys.length; i++) {
                                 let last_count = 0;
                                 let new_count = 0;
+                                var foundPos = 0;
                                 while (true) {
-                                    let foundPos = data.data.indexOf(keys[i], last_count);
+                                    foundPos = data.data.indexOf(keys[i], foundPos);
                                     if (foundPos == -1) 
                                         break;
-                                    last_count = foundPos + 1;
+                                    else
+                                        last_count++;
+                                    foundPos = foundPos + 1;
                                 }
+                                foundPos = 0;
                                 while (true) {
-                                    let foundPos = new_result.indexOf(keys[i], new_count);
+                                    foundPos = new_result.indexOf(keys[i], foundPos);
                                     if (foundPos == -1) 
                                         break;
-                                    new_count = foundPos + 1;
+                                    else
+                                        new_count++;
+                                    foundPos = foundPos + 1;
                                 }
                                 //если число ключевых слов изменилось, то оповещаем об этом
-                                if(last_count > new_count){
-                                    ahtyng(company.companyName, data.url, key)
-                                    data.updated++;
+                                if(last_count < new_count){
+                                    if(company.update != 0)
+                                        ahtyng(company.companyName, data.url, keys[i])
+                                    company.update++;
                                     break;
                                 } 
                             }  
@@ -80,11 +87,13 @@ exports.monitoring = function(){
 
 function ahtyng(name, url, key){
     server.send({
-        text: name+' обновление с ключевым словом '+key+', url: '+url, 
+        text: name+' обновление с ключевым словом "'+key+'", url: '+url, 
         from: 'Рейтинг <reestr@da-strateg.ru>',
         to: getConfig().email,
-        subject: name+'Обновление'
-    }, function(err, message) { console.log(err || message); });
+        subject: 'Обновление '+name
+    }, function(err, message) { 
+        //console.log(err || message); 
+    });
 }
 
 function downloadPage(url) {

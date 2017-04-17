@@ -1,0 +1,81 @@
+head
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+
+    // Styles
+    link(rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css")
+    link(rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css")
+    link(href='/css/styles.css' rel="stylesheet" type="text/css")
+
+    //JS
+    script(src='/js/jquery-3.1.1.min.js')
+    script(src="//netdna.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js")
+    script(src='/js/dateFormat.js')
+body
+if (user)
+    .container
+        .row
+            .col-md-4
+                br
+                form(action='/search', method='POST')
+                    input(type='text', name='search_company', placeholder='Компания')
+                    br
+                    button.btn.btn-success Поиск 
+                hr
+                form(action='/create/company', method='POST')
+                    input(type='text', name='name', placeholder='Компания')
+                    br
+                    input(type='text', name='url', placeholder='Ссылка')
+                    |   (в формате "http://url.com")
+                    br
+                    button.btn.btn-primary Добавить 
+                    hr
+                    h3
+                        |Конфиг
+                    h4
+                        | Почта: "#{config.email}"
+                        br
+                        -var time = Math.round(config.timeframe/1000)
+                        | Обновление раз в #{time} секунд
+                        br
+                        | Ключевые слова: 
+                        -for(var i=0; i<config.keyWords.length-1; i++)
+                            | "#{config.keyWords[i]}", 
+                        | "#{config.keyWords[config.keyWords.length-1]}".
+                hr
+                form(action='/setconfig',  method='POST')
+                    input(type='text', name='email', placeholder='email')
+                    br
+                    input(type='text', name='timeframe', placeholder='Время обновления')
+                    br
+                    input(type='text', name='keywords', placeholder='ключевые слова через ","')
+                    br
+                    button.btn.btn-primary Сохранить
+                 a(href='/logout') Выйти
+            .col-md-8
+                br
+                table.table
+                    thead.thead-inverse
+                        tr
+                            th Компания
+                            th Ссылка
+                            th Обновления
+                            th
+                        tbody
+                        tr
+                            -for(var i=0; i<data.length; i++)
+                                -for(var j=0; j<data[i].urls.length; j++)
+                                    td
+                                        | #{data[i].companyName}
+                                    td
+                                        | #{data[i].urls[j].url}
+                                    td
+                                        | #{data[i].update}
+                                    td
+                                        a(href='/delete/#{data[i]._id}/#{data[i].urls[j]._id}')
+                                            | Удалить
+                                    tr
+                                 
+else
+    | Авторизуйтесь

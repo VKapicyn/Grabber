@@ -1,0 +1,9 @@
+a(href='/')
+    | <-- На главную
+
+h3 Create user
+form(method='post', action='/create/user')
+    input(type='text', name='username')
+    input(type='password', name='password')
+    br
+    input(type='submit')
