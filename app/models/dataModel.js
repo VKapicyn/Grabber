@@ -69,8 +69,7 @@ exports.monitoring = function(){
                                 }
                                 //если число ключевых слов изменилось, то оповещаем об этом
                                 if(last_count < new_count){
-                                    if(data.update != 0)
-                                        ahtyng(company.companyName, data.url, keys[i])
+                                    ahtyng(company.companyName, data.url, keys[i])
                                     data.update++;
                                     break;
                                 } 
