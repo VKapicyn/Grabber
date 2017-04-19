@@ -17,6 +17,7 @@ exports.addCompany = function(req, res){
         obj.url = req.body.url;
         obj.data = '';
         obj.hashCode = '';
+        obj.update = 0;
         dataModel.findOne({companyName: req.body.name}).then(function(result){
             if (result != null){
                 result.urls.push(obj);
@@ -24,7 +25,6 @@ exports.addCompany = function(req, res){
             } else {
                 var company = new dataModel();
                 company.companyName = req.body.name;
-                company.update = 0;
                 company.urls.push(obj);
                 company.save();
             }

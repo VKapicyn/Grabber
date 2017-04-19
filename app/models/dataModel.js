@@ -15,11 +15,12 @@ var iconv  = require('iconv-lite');
 
 var dataSchema = new mongoose.Schema({
     companyName: String,
-    update: Number, //при инициализации 0
+    //update: Number, //при инициализации 0
     urls:[{
         url:String,
         data: String,
-        hashCode: String  
+        hashCode: String,
+        update: Number
     }]
 });
 
@@ -68,9 +69,9 @@ exports.monitoring = function(){
                                 }
                                 //если число ключевых слов изменилось, то оповещаем об этом
                                 if(last_count < new_count){
-                                    if(company.update != 0)
+                                    if(data.update != 0)
                                         ahtyng(company.companyName, data.url, keys[i])
-                                    company.update++;
+                                    data.update++;
                                     break;
                                 } 
                             }  

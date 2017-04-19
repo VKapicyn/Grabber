@@ -16,7 +16,7 @@ body
 if (user)
     .container
         .row
-            .col-md-4
+            .col-md-2
                 br
                 form(action='/search', method='POST')
                     input(type='text', name='search_company', placeholder='Компания')
@@ -33,11 +33,13 @@ if (user)
                     hr
                     h3
                         |Конфиг
-                    h4
+                    h5
                         | Почта: "#{config.email}"
+                        br
                         br
                         -var time = Math.round(config.timeframe/1000)
                         | Обновление раз в #{time} секунд
+                        br
                         br
                         | Ключевые слова: 
                         -for(var i=0; i<config.keyWords.length-1; i++)
@@ -71,7 +73,7 @@ if (user)
                                     td
                                         | #{data[i].urls[j].url}
                                     td
-                                        | #{data[i].update}
+                                        | #{data[i].urls[j].update}
                                     td
                                         a(href='/delete/#{data[i]._id}/#{data[i].urls[j]._id}')
                                             | Удалить
