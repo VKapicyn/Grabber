@@ -109,7 +109,6 @@ function downloadPage(url) {
                             body = $('#content2').html();
                         }
                         data = body
-                            .replace(/<\/?[^>]+>/g,'')
                             .replace(/ /g, '')
                             .replace(/\n/g, '');
                         resolve(data);
