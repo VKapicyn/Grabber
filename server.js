@@ -38,7 +38,8 @@ let timeId = setInterval(function(){
   monitoring();
 }, require('./app/models/dataModel').getConfig().timeframe);
 
-app.get('/', require('./app/controllers/main').mainPage);
+app.get('/', function(req, res){res.redirect('/main/0');})
+app.get('/main/:page', require('./app/controllers/main').mainPage);
 app.get('/logout', require('./app/controllers/auth').logout);//выйти
 app.get('/login', require('./app/controllers/auth').loginPage);//войти
 app.get('/create', require('./app/controllers/auth').createPage);//создать новго пользователя

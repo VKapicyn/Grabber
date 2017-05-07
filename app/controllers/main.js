@@ -3,9 +3,16 @@ var fs = require('fs');
 
 exports.mainPage = function(req, res){
     if(req.session.user)
-        dataModel.find().limit(50).then(function(data){
+        dataModel.find().then(function(result){
             config = JSON.parse(fs.readFileSync('src/dataConfig.json', 'utf8'));
-            res.render('main', {user: req.session.user, data: data, config: config});
+            let pages = {};
+            let data = result.slice(req.params.page*50, Number(req.params.page)*50+50);
+            pages.size = result.length;
+            pages.count = Math.ceil(Number(pages.size)/50);
+            pages.prev = Number(req.params.page)-1;
+            pages.next = Number(req.params.page)+1;
+            pages.now = req.params.page; 
+            res.render('main', {user: req.session.user, data: data, config: config, pages: pages});
         })
     else
         res.redirect('/login');
@@ -66,12 +73,30 @@ exports.setConfig = function(req, res){
 
 exports.searchCompany = function(req, res){
     if(req.session.user){
+        config = JSON.parse(fs.readFileSync('src/dataConfig.json', 'utf8'));
         let query = dataModel.find();
         if (req.body.search_company != '')
             query.where({companyName: {$regex: req.body.search_company, $options:'i'}})
+        if (req.body.search_results != '')
+            dataModel.find().then(function(data){
+                let some = [];
+                for(var i=0; i<data.length; i++){
+                    let obj = {};
+                    for(var j=0; j<data[i].urls.length; j++){
+                        obj.companyName = data[i].companyName;
+                        obj.urls = [];
+                        if (data[i].urls[j].update >= Number(req.body.search_results)){
+                            obj.urls.push(data[i].urls[j]);
+                        }
+                    }
+                    if (obj.urls!=undefined)
+                        if(obj.urls.length > 0)
+                        some.push(obj);
+                }
+                res.render('main', {user: req.session.user, data: some, config: config, pages: null});
+            })
 
-        query.limit(50).then(function(data){
-            config = JSON.parse(fs.readFileSync('src/dataConfig.json', 'utf8'));
+        query.then(function(data){
             res.render('main', {user: req.session.user, data: data, config: config});
         })
     }

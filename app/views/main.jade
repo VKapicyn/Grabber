@@ -20,8 +20,11 @@ if (user)
                 br
                 form(action='/search', method='POST')
                     input(type='text', name='search_company', placeholder='Компания')
+                    input(type='text', name='search_results', placeholder='Updates') 
                     br
-                    button.btn.btn-success Поиск 
+                    button.btn.btn-success Поиск
+                    br 
+                    a(href='/') Сброс поиска
                 hr
                 form(action='/create/company', method='POST')
                     input(type='text', name='name', placeholder='Компания')
@@ -78,6 +81,15 @@ if (user)
                                         a(href='/delete/#{data[i]._id}/#{data[i].urls[j]._id}')
                                             | Удалить
                                     tr
+                -if(pages!=null)
+                    p
+                        | Всего компаний: #{pages.size}. 
+                        -if(pages.prev >=0)
+                            a(href='/main/#{pages.prev}') <<
+                        |  [#{pages.now}] 
+                        -if(pages.count > pages.next)
+                            a(href='/main/#{pages.next}') >>
+                        
                                  
 else
     | Авторизуйтесь
