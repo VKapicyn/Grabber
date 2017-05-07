@@ -69,7 +69,8 @@ exports.monitoring = function(){
                                 }
                                 //если число ключевых слов изменилось, то оповещаем об этом
                                 if(last_count < new_count){
-                                    ahtyng(company.companyName, data.url, keys[i])
+                                    if(data.update != 0)
+                                        ahtyng(company.companyName, data.url, keys[i])
                                     data.update++;
                                     break;
                                 } 
@@ -109,8 +110,6 @@ function downloadPage(url) {
                             body = $('#content2').html();
                         }
                         data = body
-                            .replace(/ /g, '')
-                            .replace(/\n/g, '');
                         resolve(data);
                     }
                     catch(e){
