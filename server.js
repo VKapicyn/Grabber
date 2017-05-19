@@ -44,6 +44,7 @@ app.get('/logout', require('./app/controllers/auth').logout);//выйти
 app.get('/login', require('./app/controllers/auth').loginPage);//войти
 app.get('/create', require('./app/controllers/auth').createPage);//создать новго пользователя
 app.get('/delete/:company/:id', require('./app/controllers/main').delCompany);
+app.get('/list', require('./app/controllers/main').getCompanies);
 app.post('/create/user', require('./app/controllers/auth').createUser);
 app.post('/user/login', require('./app/controllers/auth').login);
 app.post('/create/company', require('./app/controllers/main').addCompany);

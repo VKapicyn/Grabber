@@ -18,6 +18,22 @@ exports.mainPage = function(req, res){
         res.redirect('/login');
 }
 
+exports.getCompanies = function(req, res) {
+    if(req.session.user){
+        dataModel.find().then(function(result){
+            let itog = '';
+            result.map(company => {
+                company.urls.map(url => {
+                    itog+=company.companyName+';'+url.url+'<br>';
+                })
+            })
+            res.send(itog);
+        })
+    }
+    else
+        res.redirect('/login');
+}
+
 exports.addCompany = function(req, res){
     if(req.session.user){
         let obj = {};
